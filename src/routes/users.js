@@ -1,12 +1,13 @@
 const express = require('express');
+
 const router = express.Router();
-const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const User = require('../models/User');
 const config = require('../../config'); // Assuming config file for email settings
-const authMiddleware= require('../middleware/auth')
+const authMiddleware = require('../middleware/auth');
 // User registration
 router.post('/register', async (req, res) => {
   try {
@@ -31,7 +32,7 @@ router.post('/register', async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      is_verified: false // Initially set to false
+      is_verified: false, // Initially set to false
     });
 
     // Generate verification token
@@ -46,18 +47,20 @@ router.post('/register', async (req, res) => {
       from: config.email.auth.user, // Use configured sender email
       to: user.email,
       subject: 'Verify Your Email',
-      text: `Please verify your email by clicking this link: http://your-app-url/verify-email/${verificationToken}`
+      text: `Please verify your email by clicking this link: http://your-app-url/verify-email/${verificationToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending verification email:', error);
       } else {
-        console.log('Verification email sent: ' + info.response);
+        console.log(`Verification email sent: ${info.response}`);
       }
     });
 
-    res.status(201).json({ message: 'User created successfully, please verify your email' });
+    res
+      .status(201)
+      .json({ message: 'User created successfully, please verify your email' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -87,7 +90,9 @@ router.post('/login', async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
 
     res.json({ token });
   } catch (error) {
@@ -132,14 +137,14 @@ router.post('/forgot-password', async (req, res) => {
       from: config.email.auth.user, // Use configured sender email
       to: user.email,
       subject: 'Password Reset',
-      text: `You are receiving this email because you requested a password reset. Please click the following link to reset your password: http://your-app-url/reset-password/${resetToken}`
+      text: `You are receiving this email because you requested a password reset. Please click the following link to reset your password: http://your-app-url/reset-password/${resetToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error(error);
       } else {
-        console.log('Email sent: ' + info.response);
+        console.log(`Email sent: ${info.response}`);
       }
     });
 
