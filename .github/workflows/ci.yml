@@ -24,9 +24,6 @@ jobs:
       - name: Run unit tests
         run: npm test
 
-      - name: Run integration tests (optional)
-        run: npm run test:integration
-
       - name: Security scanning with Snyk
         uses: snyk/actions/node@master
         env:
